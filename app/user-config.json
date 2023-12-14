@@ -1,0 +1,11 @@
+{
+    "_target_reader":"Alcorlink USB Smart Card Reader 0",
+    "_url":"http://localhost/egpms",
+    "_working_dir":"C:\\MyKad Wedge",
+    "_exec_file": "Reading.exe",
+    "_result_file":"mykadresult.txt",
+    "_image_folder":"image",
+    "_image_scheduler_setting": "0 00 21 * * *",
+    "_keep_images": 1,
+    "_clean_up_images_after_x_month": 1
+}

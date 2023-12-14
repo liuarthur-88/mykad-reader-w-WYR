@@ -1,0 +1,5 @@
+node_modules/
+logs/
+app/test.js
+app/test-2.js
+dist/

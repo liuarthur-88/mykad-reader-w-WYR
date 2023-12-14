@@ -1,0 +1,47 @@
+{
+  "name": "mykad-integrt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/app.js",
+  "bin": {
+    "mykad-integrt": "app/app.js"
+  },
+  "scripts": {
+    "start": "node .\\app\\app.js",
+    "build": "npm run copy-config && npm run copy-node && pkg package.json",
+    "copy-config": "xcopy /Y /F app\\user-config.json dist\\app\\",
+    "copy-node": "node .\\pck\\dist.js"
+  },
+  "pkg": {
+    "scripts": "app/**/*.js",
+    "assets": [
+      "app/media/**/*",
+      "app/utils/**/*",
+      "node_modules/trayicon/rsrcs/**/*",
+      "!app/user-config.json"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ],
+    "options": {
+      "build": "--no-bytecode"
+    },
+    "outputPath": "dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "moment": "^2.29.4",
+    "node-gyp": "^10.0.1",
+    "node-notifier": "^10.0.1",
+    "node-schedule": "^2.1.1",
+    "pcsclite": "^1.0.1",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {
+    "ncp": "^2.0.0"
+  }
+}
