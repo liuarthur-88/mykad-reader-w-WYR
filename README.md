@@ -1,21 +1,23 @@
-# eVoyze FAST Front-desk MyKad Reader
+# Integration with any website with WYR MyCard / MyKad Reader (USB)
 
-A mini NodeJS program to assist front officer/ receptionist during guest registration during check-in process.
+This is a lightweight Node.js program designed to streamline the guest registration process for front officers and receptionists during check-in. It is currently compatible with websites and can be easily modified to integrate with other systems or databases.
 
 ## Installation
 
-First off, clone the repository or download the sources from GitHub.
+To get started, clone the repository or download the source files from GitHub.
 
 ```bash
-git clone git@github.com:liu-arthur/mykad-reader-integration.git
+git clone git@github.com:liuarthur-88/mykad-reader-w-WYR.git
 ```
-Install all the necessary node module.
+Next, install all the necessary Node.js modules.
 
 ```bash
 npm install
 ```
-Last distribute the program to executable .exe
+Finally, distribute the program as an executable .exe file.
 
 ```bash
 npm run build
 ```
+
+Feel free to customize the instructions based on any additional details or steps specific to your project.

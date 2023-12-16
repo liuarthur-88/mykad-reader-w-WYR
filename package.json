@@ -1,7 +1,7 @@
 {
-  "name": "fastmykad",
+  "name": "mykadreader",
   "version": "1.0.0",
-  "description": "eVoyze FAST MyKad",
+  "description": "MyKad reader using WYR MyKad reader",
   "main": "app/app.js",
   "bin": {
     "evoyze-apps": "app/app.js"
@@ -25,7 +25,7 @@
     "outputPath": "./dist"
   },
   "keywords": [],
-  "author": "evoyze",
+  "author": "AL",
   "license": "ISC",
   "dependencies": {
     "@pokusew/pcsclite": "^0.6.0",
