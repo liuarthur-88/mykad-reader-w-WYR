@@ -1,7 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
-const axios = require('axios');
-const pcsclite = require('pcsclite');
+const fetch = require('node-fetch');
+const pcsclite = require('@pokusew/pcsclite');
 const schedule = require('node-schedule');
 const { spawn } = require('child_process');
 const appUtils = require('./utils/appUtils');
@@ -9,6 +9,7 @@ const validateConfig = require('./utils/jsonValidation');
 const currentWorkingDirectory = process.cwd();
 
 let cardInserted = false;
+let errorHandle = false;
 
 // Default setting
 const setupInfo = {
@@ -27,19 +28,31 @@ const postData = {
 const readConfig = async () => {
     try {
         const configPath = path.join(currentWorkingDirectory, 'app', 'user-config.json');
+
+        await fs.access(configPath);
+
         const rawConfig = await fs.readFile(configPath, 'utf-8');
         const config = JSON.parse(rawConfig);
 
-        const validationResult = validateConfig(config);
-    
-        if (!validationResult) {
-            appUtils.logger.info('Config validation error:', validationResult);
+        const validationResult = await validateConfig(config);
+        
+        if (typeof validationResult === 'string') {
+
+            appUtils.winNotification({
+                appID: setupInfo.appID,
+                message: 'Config validation error, please check the json file.',
+                wait: false,
+                time: 2,
+            }, () => { });
+
+            appUtils.logger.info('Config validation error, please check the json file.');
+
+            return;
         }
 
         appUtils.logger.info('--======================================--');
         appUtils.logger.info('--======= Config validation - ok =======--');
         appUtils.logger.info('--======================================--');
-        
 
         setupInfo.targetReaderName = config._target_reader;
         setupInfo.baseUrl = config._url;
@@ -61,7 +74,15 @@ const readConfig = async () => {
 
 
     } catch (error) {
-        appUtils.logger.info('Error reading config file:', error.message);
+
+        appUtils.winNotification({
+            appID: setupInfo.appID,
+            message: `Error reading config file: ${error}`,
+            wait: false,
+            time: 2,
+        }, () => { });
+
+        appUtils.logger.info('Error reading config file:', error);
     }
 }
 
@@ -84,7 +105,15 @@ const deleteOldFiles = async (directoryPath) => {
             }
         }
     } catch (error) {
-        appUtils.logger.info('Error deleting old files:', error.message);
+
+        appUtils.winNotification({
+            appID: setupInfo.appID,
+            message: 'Error deleting old files.',
+            wait: false,
+            time: 2,
+        }, () => { });
+
+        appUtils.logger.info('Error deleting old files:', error);
     }
 }
 
@@ -139,20 +168,48 @@ const handleCardInsertion = async () => {
     };
 
     try {
-        const response = await axios.post(setupInfo.fullURL, postData);
 
-        let msg = response.data.msg !== 'ok' ? response.data.msg : `Customer #: ${response.data.data.code}`;
+        const response = await fetch(setupInfo.fullURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            appUtils.winNotification({
+                appID: setupInfo.appID,
+                message: 'Failed to create/ update customer details.',
+                wait: false,
+                time: 2,
+            }, () => { });
+
+            appUtils.logger.info('Request failed with status:', response.status);
+        }
 
         appUtils.winNotification({
             appID: setupInfo.appID,
-            message: msg,
+            message: `Customer: ${postData.data.name} (${data.data.code})`,
+            bool: true, 
             wait: false,
             time: 2,
         }, () => { });
 
-        appUtils.logger.info(`Customer: ${postData.data.name} (${response.data.data.code})`);
+        appUtils.logger.info(`Customer: ${postData.data.name} (${data.data.code})`);
 
     } catch (error) {
+
+        appUtils.winNotification({
+            appID: setupInfo.appID,
+            message: 'Error making POST request',
+            wait: false,
+            time: 2,
+        }, () => { });
+
         appUtils.logger.info('Error making POST request:', error);
     }
 };
@@ -173,6 +230,14 @@ const setupReader = (reader) => {
 
                 if (status.atr == 0) {
                     cardInserted = false;
+
+                    appUtils.winNotification({
+                        appID: setupInfo.appID,
+                        message: 'Invalid card',
+                        wait: false,
+                        time: 2,
+                    }, () => { });
+
                     appUtils.logger.info('Invalid card');
                     return;
                 }
@@ -180,7 +245,9 @@ const setupReader = (reader) => {
                 await handleCardInsertion();
             }
         } catch (error) {
+
             appUtils.logger.info('Error during card insertion/ withdrawn.');
+
         } finally {
             if (cardStatus) {
                 handleCardRemoval();
@@ -189,7 +256,15 @@ const setupReader = (reader) => {
     });
 
     reader.on('error', (err) => {
-        appUtils.logger.info(`Error in the reader ${setupInfo.targetReaderName}:`, err.message);
+
+        appUtils.winNotification({
+            appID: setupInfo.appID,
+            message: 'Error in the reader',
+            wait: false,
+            time: 2,
+        }, () => { });
+
+        appUtils.logger.info(`Error in the reader ${setupInfo.targetReaderName}:`, err);
     });
 };
 
@@ -212,7 +287,7 @@ const init = async () => {
         const pcsc = pcsclite();
 
         pcsc.on('reader', (reader) => {
-            
+
             if (!reader.name) {
                 reader.close();
                 reader.on('end', () => { });
@@ -224,9 +299,25 @@ const init = async () => {
         });
 
         pcsc.on('error', (err) => {
+
+            appUtils.winNotification({
+                appID: setupInfo.appID,
+                message: 'PC/SC error',
+                wait: false,
+                time: 2,
+            }, () => { });
+
             appUtils.logger.info('PC/SC error:', err);
         });
     } catch (error) {
+
+        appUtils.winNotification({
+            appID: setupInfo.appID,
+            message: `Caught an error: ${error}`,
+            wait: false,
+            time: 2,
+        }, () => { });
+
         appUtils.logger.info('Caught an error:', error);
     }
 }

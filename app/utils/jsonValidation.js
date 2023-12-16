@@ -1,9 +1,6 @@
-const fs = require('fs');
-const path = require('path');
 const appUtils = require('./appUtils');
-const currentWorkingDirectory = process.cwd();
 
-const validateConfig = (config) => {
+const validateConfig = async (config) => {
 
     const requiredFields = ['_target_reader', '_url', '_working_dir', '_exec_file', '_result_file', '_image_folder', '_image_scheduler_setting', '_keep_images', '_clean_up_images_after_x_month'];
 

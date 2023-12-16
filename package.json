@@ -1,43 +1,39 @@
 {
-  "name": "mykad-integrt",
+  "name": "fastmykad",
   "version": "1.0.0",
-  "description": "",
+  "description": "eVoyze FAST MyKad",
   "main": "app/app.js",
   "bin": {
-    "mykad-integrt": "app/app.js"
+    "evoyze-apps": "app/app.js"
   },
   "scripts": {
-    "start": "node .\\app\\app.js",
-    "build": "npm run copy-config && npm run copy-node && pkg package.json",
+    "dev": "nodemon .\\app\\app.js",
+    "clean": "rimraf dist",
     "copy-config": "xcopy /Y /F app\\user-config.json dist\\app\\",
-    "copy-node": "node .\\pck\\dist.js"
+    "copy-node": "node .\\pck\\dist.js",
+    "build": "npm run clean && npm run copy-config && npm run copy-node && pkg --build --compress GZip package.json"
   },
   "pkg": {
-    "scripts": "app/**/*.js",
+    "scripts": ["app/app.js", "app/utils/*.js"],
     "assets": [
-      "app/media/**/*",
-      "app/utils/**/*",
-      "node_modules/trayicon/rsrcs/**/*",
-      "!app/user-config.json"
+      "!app/user-config.json",
+      "node_modules/@pokusew/pcsclite/**/*"
     ],
     "targets": [
-      "node18-win-x64"
+      "node18-win"
     ],
-    "options": {
-      "build": "--no-bytecode"
-    },
-    "outputPath": "dist"
+    "outputPath": "./dist"
   },
   "keywords": [],
-  "author": "",
+  "author": "evoyze",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.27.2",
+    "@pokusew/pcsclite": "^0.6.0",
     "moment": "^2.29.4",
-    "node-gyp": "^10.0.1",
+    "node-fetch": "^2.7.0",
     "node-notifier": "^10.0.1",
     "node-schedule": "^2.1.1",
-    "pcsclite": "^1.0.1",
+    "rimraf": "^5.0.5",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^4.7.1"
   },

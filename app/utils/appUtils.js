@@ -6,7 +6,9 @@ const notifier = require('node-notifier').WindowsToaster;
 const DailyRotateFile = require('winston-daily-rotate-file');
 
 const currentWorkingDirectory = path.join(process.cwd());
-const iconPath = path.join(currentWorkingDirectory, 'app', './media/logo/favicon.ico');
+const addIconPath = path.join(currentWorkingDirectory, 'app', './media/logo/team.png');
+const errorIconPath = path.join(currentWorkingDirectory, 'app', './media/logo/close.png');
+
 
 const appUtils = () => { };
 
@@ -40,7 +42,9 @@ appUtils.isPrivateIP = (ip) => {
 
 // ========================================================================
 // Pop-out notification
-appUtils.winNotification = ({ appID, message }) => {
+appUtils.winNotification = ({ appID, message, bool }) => {
+
+  const iconPath = bool ? addIconPath : errorIconPath;
 
   const Notification = new notifier({
     withFallback: false, // Try Windows Toast and Growl first?

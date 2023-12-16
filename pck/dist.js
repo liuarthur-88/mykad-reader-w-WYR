@@ -15,10 +15,13 @@ const filesToCopy = [
 ];
 
 // Additional file to copy
-const additionalFile = 'app/media/logo/favicon.ico';
+const additionalFile = [
+  'app/media/logo/close.png',
+  'app/media/logo/team.png'
+];
 
 // Iterate through the files and copy each one
-[...filesToCopy, additionalFile].forEach(file => {
+[...filesToCopy, ...additionalFile].forEach(file => {
   const sourcePath = file.startsWith('app') ? file : path.join(sourceDir, file);
   const destinationPath = file.startsWith('app')
     ? path.join('dist', file)
@@ -27,8 +30,10 @@ const additionalFile = 'app/media/logo/favicon.ico';
   // Create destination directory if it doesn't exist
   fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
 
-  // Copy the file
-  fs.copyFileSync(sourcePath, destinationPath);
+  if (fs.existsSync(sourcePath)) {
+    // Copy the file
+    fs.copyFileSync(sourcePath, destinationPath);
+  }
 
   console.log(`Copied: ${sourcePath} -> ${destinationPath}`);
 });
